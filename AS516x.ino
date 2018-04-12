@@ -35,7 +35,7 @@ void setup() {
 void send(bool rw ,uint8_t address,uint8_t data1,uint8_t data2){
   Serial1.write( (address&0x7f)+(rw?(1<<7):0));// address
   if(!rw){
-    delay(5);
+    delay(10);
     return;
   }
   Serial1.write( data1);// data two
