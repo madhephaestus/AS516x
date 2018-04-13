@@ -10,11 +10,11 @@ HardwareSerial Serial1(1);
 uint8_t stream[NUM_DATA_BYTES];
 
 #define  CUSTID 0
-#define  CLH 0
-#define  CLL 0
+#define  CLH 51
+#define  CLL 51
 #define  OFFSET 0
-#define  GAIN 0
-#define  BP 0
+#define  GAIN 6552
+#define  BP 10240
 #define  ANGLERNG 0
 #define  DIAG_HIGH 0
 #define  QUADEN 0b01
@@ -33,22 +33,24 @@ void setup() {
 }
 
 void send(bool rw ,uint8_t address,uint8_t data1,uint8_t data2){
+  Serial1.write( 0x55);// synchronization frame
   Serial1.write( (address&0x7f)+(rw?(1<<7):0));// address
-  if(!rw){
-    delay(10);
+  if(rw){
+    Serial1.write( data1);// data two
+    Serial1.write( data2);// data one
+    Serial.println("Address "+String(address)+" data1 "+String(data1)+" data2 "+String(data2));
     return;
   }
-  Serial1.write( data1);// data two
-  Serial1.write( data2);// data one
-  Serial.println("Address "+String(address)+" data1 "+String(data1)+" data2 "+String(data2));
+  delay(100);
+  //Serial.println("Address "+String(Serial1.read())+" data1 "+String(Serial1.read())+" data2 "+String(Serial1.read())+" read data1 "+String(Serial1.read())+" read data2 "+String(Serial1.read()));
+
 }
 
 
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial1.write( 0x55);// synchronization frame
   delay(10);
-  for(int i=0;i<NUM_DATA_BYTES/2;i++){
+  for(int i=0;i<NUM_DATA_BYTES;i++){
     stream[i]=0;
   }
   
@@ -74,7 +76,9 @@ void loop() {
   for(int i=0;i<NUM_DATA_BYTES;i+=2){
     send(false,i,stream[i],stream[i+1]);
   }
-  send(true,Pass2Func,AS5162KEY& 0xFF,(AS5162KEY>>8) & 0xFF);
+ send(true,Pass2Func,AS5162KEY& 0xFF,(AS5162KEY>>8) & 0xFF); 
+ //send(true,FuseRegister,AS5162KEY& 0xFF,(AS5162KEY>>8) & 0xFF);
+
  Serial.println("\r\n\r\nSession ");
 
   delay(100);
