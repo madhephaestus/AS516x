@@ -9,15 +9,15 @@ HardwareSerial Serial1(1);
 
 uint8_t stream[NUM_DATA_BYTES];
 
-#define  CUSTID 0
-#define  CLH 51
-#define  CLL 51
-#define  OFFSET 0
-#define  GAIN 6552
+#define  CUSTID 37
+#define  CLH 102
+#define  CLL 102
+#define  OFFSET 819
+#define  GAIN 1229
 #define  BP 10240
 #define  ANGLERNG 0
 #define  DIAG_HIGH 0
-#define  QUADEN 0b01
+#define  QUADEN 0
 #define  AIRGAPSEL 0
 #define  HYSTSEL 0
 
@@ -34,7 +34,7 @@ void setup() {
 
 void send(bool rw ,uint8_t address,uint8_t data1,uint8_t data2){
   Serial1.write( 0x55);// synchronization frame
-  Serial1.write( (address&0x7f)+(rw?(1<<7):0));// address
+  Serial1.write( (address&0x7f)+(!rw?(1<<7):0));// address
   if(rw){
     Serial1.write( data1);// data two
     Serial1.write( data2);// data one
@@ -53,7 +53,25 @@ void loop() {
   for(int i=0;i<NUM_DATA_BYTES;i++){
     stream[i]=0;
   }
-  
+    // 8009 0000 0099 A006 6666 
+
+  //     
+  stream[0]  =0x80;
+  stream[1]  =0x09;
+  stream[2]  =0x0;
+  stream[3]  =0x0;
+  stream[4]  =0x0;
+  stream[5]  =0x99;
+  stream[6]  =0xA0;
+  stream[7]  =0x06;
+  stream[8]  =0x66;
+  stream[9]  =0x66;
+  stream[10]  =0x33;
+  stream[11]  =0x0;
+  stream[12]  =0x0;
+  stream[13]  =0x94;
+
+  /*
   stream[0]  =CUST_LOCK<<7 | RED_BIT <<4 |RED_ADD;
   stream[1]  = HYSTSEL<<1 | AIRGAPSEL;
   stream[2]  = QUADEN<<6|DIAG_HIGH<<5|ANGLERNG<<4|((BP & (0b1111<<10))>>10);
@@ -67,7 +85,7 @@ void loop() {
   stream[10]  = (CLH)>>1;
   stream[11]  = (CLH & 0b1)<<7;
   stream[13]  =CUSTID<<2;
-
+*/
   for(int i=0;i<NUM_DATA_BYTES;i+=2){
     send(true,i,stream[i],stream[i+1]);
   }
