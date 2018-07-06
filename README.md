@@ -1,2 +1,2 @@
 # AS516x
-Arduino Library for configuring AS516x encoders
+Arduino sketch for configuring AS516x encoders
